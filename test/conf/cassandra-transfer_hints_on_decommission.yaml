@@ -1,118 +1,131 @@
-#
-# Warning!
-# Consider the effects on 'o.a.c.i.s.LegacySSTableTest' before changing schemas in this file.
-#
-cluster_name: Test Cluster
-memtable_allocation_type: heap_buffers
-# memtable_allocation_type: offheap_objects
-commitlog_sync: periodic
-commitlog_sync_period: 10s
-commitlog_segment_size: 5MiB
-commitlog_directory: build/test/cassandra/commitlog
-commitlog_disk_access_mode: legacy
-# commitlog_compression:
-# - class_name: LZ4Compressor
-cdc_raw_directory: build/test/cassandra/cdc_raw
+allocate_tokens_for_local_replication_factor: 3
+audit_logging_options:
+    enabled: false
+    logger:
+        - class_name: BinAuditLogger
+authenticator: PasswordAuthenticator
+authorizer: CassandraAuthorizer
+auto_hints_cleanup_enabled: false
+auto_snapshot: true
+batch_size_fail_threshold: 50KiB
+batch_size_warn_threshold: 5KiB
+batchlog_replay_throttle: 1024KiB
+broadcast_rpc_address: 10.244.2.4
+cas_contention_timeout: 1000ms
 cdc_enabled: false
-hints_directory: build/test/cassandra/hints
-partitioner: org.apache.cassandra.dht.ByteOrderedPartitioner
-listen_address: 127.0.0.1
-storage_port: 7012
-ssl_storage_port: 17012
-start_native_transport: true
+client_encryption_options:
+    enabled: false
+    keystore: conf/.keystore
+    keystore_password: cassandra
+    require_client_auth: false
+cluster_name: development
+column_index_cache_size: 2KiB
+column_index_size: 64KiB
+commit_failure_policy: stop
+commitlog_segment_size: 32MiB
+commitlog_sync: periodic
+commitlog_sync_period: 10000ms
+compaction_large_partition_warning_threshold: 100MiB
+compaction_throughput: 64MiB/s
+compaction_tombstone_warning_threshold: 100000
+concurrent_counter_writes: 32
+concurrent_materialized_view_builders: 1
+concurrent_materialized_view_writes: 32
+concurrent_reads: 32
+concurrent_writes: 32
+counter_cache_save_period: 7200s
+counter_cache_size: null
+counter_write_request_timeout: 5000ms
+credentials_validity: 2000ms
+diagnostic_events_enabled: false
+disk_failure_policy: stop
+drop_compact_storage_enabled: false
+dynamic_snitch_badness_threshold: 1
+dynamic_snitch_reset_interval: 600000ms
+dynamic_snitch_update_interval: 100ms
+endpoint_snitch: GossipingPropertyFileSnitch
+hinted_handoff_enabled: true
+hinted_handoff_throttle: 1024KiB
+hints_flush_period: 10000ms
+incremental_backups: false
+index_summary_capacity: null
+index_summary_resize_interval: 60m
+inter_dc_tcp_nodelay: false
+internode_compression: dc
+key_cache_save_period: 4h
+key_cache_size: null
+listen_address: 10.244.2.4
+materialized_views_enabled: false
+max_hint_window: 3h
+max_hints_delivery_threads: 2
+max_hints_file_size: 128MiB
+memtable_allocation_type: heap_buffers
+native_transport_allow_older_protocols: true
 native_transport_port: 9042
-column_index_size: 4KiB
-saved_caches_directory: build/test/cassandra/saved_caches
-data_file_directories:
-    - build/test/cassandra/data
-disk_access_mode: mmap_index_only
+network_authorizer: AllowAllNetworkAuthorizer
+num_tokens: "16"
+partitioner: org.apache.cassandra.dht.Murmur3Partitioner
+permissions_validity: 2000ms
+prepared_statements_cache_size: null
+range_request_timeout: 10000ms
+read_request_timeout: 5000ms
+repaired_data_tracking_for_partition_reads_enabled: false
+repaired_data_tracking_for_range_reads_enabled: false
+replica_filtering_protection:
+    cached_rows_fail_threshold: 32000
+    cached_rows_warn_threshold: 2000
+report_unconfirmed_repaired_data_mismatches: false
+request_timeout: 10000ms
+role_manager: CassandraRoleManager
+roles_validity: 2000ms
+row_cache_save_period: 0s
+row_cache_size: 0MiB
+rpc_address: 0.0.0.0
+rpc_keepalive: true
+sasi_indexes_enabled: false
+scripted_user_defined_functions_enabled: false
 seed_provider:
-    - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+    - class_name: org.apache.cassandra.locator.K8SeedProvider
       parameters:
-          - seeds: "127.0.0.1:7012"
-endpoint_snitch: org.apache.cassandra.locator.SimpleSnitch
-dynamic_snitch: true
+        - seeds: development-seed-service,development-test-cluster-additional-seed-service
 server_encryption_options:
     internode_encryption: none
     keystore: conf/.keystore
     keystore_password: cassandra
+    legacy_ssl_storage_port_enabled: false
+    require_client_auth: false
+    require_endpoint_verification: false
     truststore: conf/.truststore
     truststore_password: cassandra
-incremental_backups: true
-concurrent_compactors: 4
-compaction_throughput: 0MiB/s
-row_cache_class_name: org.apache.cassandra.cache.OHCProvider
-row_cache_size: 16MiB
-user_defined_functions_enabled: true
-scripted_user_defined_functions_enabled: false
-prepared_statements_cache_size: 1MiB
-corrupted_tombstone_strategy: exception
-stream_entire_sstables: true
-stream_throughput_outbound: 23841858MiB/s
-sasi_indexes_enabled: true
-materialized_views_enabled: true
-drop_compact_storage_enabled: true
-file_cache_enabled: true
-full_query_logging_options:
-  allow_nodetool_archive_command: true
-auto_hints_cleanup_enabled: true
-
-heap_dump_path: build/test
-dump_heap_on_uncaught_exception: false
-
-read_thresholds_enabled: true
-coordinator_read_size_warn_threshold: 1024KiB
-coordinator_read_size_fail_threshold: 4096KiB
-local_read_size_warn_threshold: 4096KiB
-local_read_size_fail_threshold: 8192KiB
-row_index_read_size_warn_threshold: 4096KiB
-row_index_read_size_fail_threshold: 8192KiB
-
-memtable:
-    configurations:
-        skiplist:
-            class_name: SkipListMemtable
-        trie:
-            class_name: TrieMemtable
-            parameters:
-                shards: 4
-        skiplist_sharded:
-            class_name: ShardedSkipListMemtable
-            parameters:
-                serialize_writes: false
-        skiplist_sharded_locking:
-            inherits: skiplist_sharded
-            parameters:
-                serialize_writes: true
-        skiplist_remapped:
-            inherits: skiplist
-        test_fullname:
-            class_name: org.apache.cassandra.db.memtable.TestMemtable
-        test_shortname:
-            class_name: TestMemtable
-            parameters:
-                skiplist: true  # note: YAML must interpret this as string, not a boolean
-        test_empty_class:
-            class_name: ""
-        test_missing_class:
-            parameters:
-        test_unknown_class:
-            class_name: NotExisting
-        test_invalid_param:
-            class_name: SkipListMemtable
-            parameters:
-                invalid: throw
-        test_invalid_extra_param:
-            inherits: test_shortname
-            parameters:
-                invalid: throw
-        test_invalid_factory_method:
-            class_name: org.apache.cassandra.cql3.validation.operations.CreateTest$InvalidMemtableFactoryMethod
-        test_invalid_factory_field:
-            class_name: org.apache.cassandra.cql3.validation.operations.CreateTest$InvalidMemtableFactoryField
-        test_memtable_metrics:
-            class_name: TrieMemtable
-# Note: keep the memtable configuration at the end of the file, so that the default mapping can be changed without
-# duplicating the whole section above.
+slow_query_log_timeout: 500ms
+snapshot_before_compaction: false
+snapshot_links_per_second: 0
+ssl_storage_port: 7001
+sstable_preemptive_open_interval: 50MiB
+start_native_transport: true
+storage_port: 7000
+tombstone_failure_threshold: 100000
+tombstone_warn_threshold: 1000
+trace_type_query_ttl: 1d
+trace_type_repair_ttl: 7d
 transfer_hints_on_decommission: true
-
+transient_replication_enabled: false
+transparent_data_encryption_options:
+    chunk_length_kb: 64
+    cipher: AES/CBC/PKCS5Padding
+    enabled: false
+    key_alias: testing:1
+    key_provider:
+        - class_name: org.apache.cassandra.security.JKSKeyProvider
+          parameters:
+            - key_password: cassandra
+              keystore: conf/.keystore
+              keystore_password: cassandra
+              store_type: JCEKS
+trickle_fsync: false
+trickle_fsync_interval: 10240KiB
+truncate_request_timeout: 60000ms
+unlogged_batch_across_partitions_warn_threshold: 10
+user_defined_functions_enabled: false
+uuid_sstable_identifiers_enabled: false
+write_request_timeout: 2000ms
